@@ -261,6 +261,14 @@ func TestPrint(t *testing.T) {
 	omstr = fmt.Sprintf("%s", m)
 	omstr = strings.ReplaceAll(omstr, "OrderedMap", "map")
 	gotwant.Test(t, omstr, stdstr)
+
+	m2 := orderedmap.New[string, any]()
+	err := m2.UnmarshalJSON([]byte(`{"a":1,"z":999,"b":2}`))
+	gotwant.TestError(t, err, nil)
+	gotwant.Test(t, m2.Keys(), []string{"a", "z", "b"})
+	omstr = fmt.Sprintf("%#v", m2)
+	gotwant.Test(t, omstr, `OrderedMap[string]interface {}{"a":1, "z":999, "b":2}`)
+
 }
 
 func TestSort(t *testing.T) {

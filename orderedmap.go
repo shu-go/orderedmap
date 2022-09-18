@@ -336,15 +336,17 @@ func (m OrderedMap[K, V]) Format(s fmt.State, verb rune) {
 		var k K
 		kname := reflect.TypeOf(k).Name()
 		var v V
+		var vname string
 		vt := reflect.TypeOf(v)
-		vpkg := path.Base(vt.PkgPath())
-		vname := vt.Name()
+		if vt == nil {
+			vname = "interface {}"
+		} else {
+			vname = path.Base(vt.PkgPath()) + "." + vt.Name()
+		}
 
 		sb.WriteString("OrderedMap[")
 		sb.WriteString(kname)
 		sb.WriteByte(']')
-		sb.WriteString(vpkg)
-		sb.WriteByte('.')
 		sb.WriteString(vname)
 		sb.WriteByte('{')
 		for i, k := range m.keys {
