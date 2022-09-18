@@ -43,10 +43,7 @@ func (m *OrderedMap[K, V]) Set(key K, value V) {
 
 	if !found {
 		m.keys = append(m.keys, key)
-		m.m[key] = elem[V]{
-			v:      value,
-			maxIdx: len(m.keys),
-		}
+		e.maxIdx = len(m.keys)
 
 	} else if m.overwriteSeq {
 		idx := m.indexOfKey(key, e.maxIdx)
