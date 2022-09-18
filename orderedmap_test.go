@@ -373,11 +373,15 @@ func TestUnmarshal(t *testing.T) {
 }`), &m)
 		gotwant.TestError(t, err, nil)
 
+		gotwant.Test(t, m.Keys(), []string{"b", "1"})
+
 		v, found := m.Get("b")
 		gotwant.Test(t, found, true)
 		gotwant.Test(t, v, myStruct{V1: "b-v1", V2: "b-v2"})
 
-		gotwant.Test(t, m.Keys(), []string{"b", "1"})
+		v, found = m.Get("1")
+		gotwant.Test(t, found, true)
+		gotwant.Test(t, v, myStruct{V1: "a-v1", V2: "a-v2"})
 	})
 
 	t.Run("MyStruct", func(t *testing.T) {
@@ -398,11 +402,15 @@ func TestUnmarshal(t *testing.T) {
 }`))
 		gotwant.TestError(t, err, nil)
 
+		gotwant.Test(t, m.Keys(), []string{"b", "1"})
+
 		v, found := m.Get("b")
 		gotwant.Test(t, found, true)
 		gotwant.Test(t, v, myStruct{V1: "b-v1", V2: "b-v2"})
 
-		gotwant.Test(t, m.Keys(), []string{"b", "1"})
+		v, found = m.Get("1")
+		gotwant.Test(t, found, true)
+		gotwant.Test(t, v, myStruct{V1: "a-v1", V2: "a-v2"})
 	})
 
 	t.Run("Nest", func(t *testing.T) {

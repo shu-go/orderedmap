@@ -214,9 +214,13 @@ func (m *OrderedMap[K, V]) UnmarshalJSON(b []byte) error {
 			continue
 		}
 
+		// not parsingKey
+
 		if tok.Type == jbdec.BeginObject {
 			valueBuf.WriteByte('{')
 			stack = append(stack, '{')
+
+			//log.Print("BeginObject", "=>", valueBuf.String())
 
 		} else if tok.Type == jbdec.EndObject {
 			if len(stack) == 0 {
@@ -228,9 +232,13 @@ func (m *OrderedMap[K, V]) UnmarshalJSON(b []byte) error {
 			valueBuf.WriteByte('}')
 			stack = stack[:len(stack)-1]
 
+			//log.Print("EndObject", "=>", valueBuf.String())
+
 		} else if tok.Type == jbdec.BeginArray {
 			valueBuf.WriteByte('[')
 			stack = append(stack, '[')
+
+			//log.Print("BeginArray", "=>", valueBuf.String())
 
 		} else if tok.Type == jbdec.EndArray {
 			if len(stack) == 0 {
@@ -239,27 +247,39 @@ func (m *OrderedMap[K, V]) UnmarshalJSON(b []byte) error {
 				return errors.New("] is mismatch")
 			}
 
+			//log.Print("EndArray", "=>", valueBuf.String())
+
 			valueBuf.WriteByte(']')
 			stack = stack[:len(stack)-1]
 
 		} else if len(stack) == 0 && tok.Type == jbdec.ValueSeparator {
+			//log.Print("IGNORED")
 			//nop
 		} else if tok.Type == jbdec.NameSeparator {
 			valueBuf.WriteByte(':')
 
+			//log.Print("NameSeparator", "=>", valueBuf.String())
+
 		} else if tok.Type == jbdec.ValueSeparator {
 			valueBuf.WriteByte(',')
+
+			//log.Print("ValueSeparator", "=>", valueBuf.String())
 
 		} else {
 			s := tok.Bytes()
 			valueBuf.Write(s)
+
+			//log.Print("else ", string(s), "=>", valueBuf.String())
 		}
 
 		if len(stack) == 0 {
+			//log.Printf("%v: %q", key, valueBuf.String())
+
 			err := json.Unmarshal(valueBuf.Bytes(), &value)
 			if err != nil {
 				return err
 			}
+			//log.Printf("%v: %#v", key, value)
 
 			m.Set(key, value)
 
