@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"sort"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/shu-go/gotwant"
@@ -208,6 +209,59 @@ func FuzzRandomOperationsReordered(f *testing.F) {
 			gotwant.Test(t, found, false)
 		}
 	})
+}
+
+func TestPrint(t *testing.T) {
+	type mystruct struct {
+		A, B string
+	}
+	std := make(map[string]mystruct)
+	std["ichi"] = mystruct{
+		A: "a1",
+		B: "b1",
+	}
+	std["ni"] = mystruct{
+		A: "a2",
+		B: "b2",
+	}
+	std["san"] = mystruct{
+		A: "a3",
+		B: "b3",
+	}
+
+	m := orderedmap.New[string, mystruct]()
+	m.Set("ichi", mystruct{
+		A: "a1",
+		B: "b1",
+	})
+	m.Set("ni", mystruct{
+		A: "a2",
+		B: "b2",
+	})
+	m.Set("san", mystruct{
+		A: "a3",
+		B: "b3",
+	})
+
+	stdstr := fmt.Sprint(std)
+	omstr := fmt.Sprint(m)
+	omstr = strings.ReplaceAll(omstr, "OrderedMap", "map")
+	gotwant.Test(t, omstr, stdstr)
+
+	stdstr = fmt.Sprintf("%+v", std)
+	omstr = fmt.Sprintf("%+v", m)
+	omstr = strings.ReplaceAll(omstr, "OrderedMap", "map")
+	gotwant.Test(t, omstr, stdstr)
+
+	stdstr = fmt.Sprintf("%#v", std)
+	omstr = fmt.Sprintf("%#v", m)
+	omstr = strings.ReplaceAll(omstr, "OrderedMap", "map")
+	gotwant.Test(t, omstr, stdstr)
+
+	stdstr = fmt.Sprintf("%s", std)
+	omstr = fmt.Sprintf("%s", m)
+	omstr = strings.ReplaceAll(omstr, "OrderedMap", "map")
+	gotwant.Test(t, omstr, stdstr)
 }
 
 func TestSort(t *testing.T) {

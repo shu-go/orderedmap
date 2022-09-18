@@ -4,7 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"path"
+	"reflect"
 	"sort"
+	"strings"
 
 	"github.com/shu-go/jbdec"
 )
@@ -320,6 +324,61 @@ func (m *OrderedMap[K, V]) Sort(less func(int, int) bool) {
 	}
 
 	sort.Sort(handler)
+}
+
+func (m OrderedMap[K, V]) Format(s fmt.State, verb rune) {
+	if verb != 'v' {
+		verb = 'v'
+	}
+
+	sb := &strings.Builder{}
+
+	switch true {
+	case s.Flag('#'):
+		var k K
+		kname := reflect.TypeOf(k).Name()
+		var v V
+		vt := reflect.TypeOf(v)
+		vpkg := path.Base(vt.PkgPath())
+		vname := vt.Name()
+
+		sb.WriteString("OrderedMap[")
+		sb.WriteString(kname)
+		sb.WriteByte(']')
+		sb.WriteString(vpkg)
+		sb.WriteByte('.')
+		sb.WriteString(vname)
+		sb.WriteByte('{')
+		for i, k := range m.keys {
+			if i != 0 {
+				sb.WriteString(", ")
+			}
+			fmt.Fprintf(sb, "%#v:%#v", k, m.m[k].v)
+		}
+		sb.WriteByte('}')
+
+	case s.Flag('+'):
+		sb.WriteString("OrderedMap[")
+		for i, k := range m.keys {
+			if i != 0 {
+				sb.WriteByte(' ')
+			}
+			fmt.Fprintf(sb, "%+v:%+v", k, m.m[k].v)
+		}
+		sb.WriteByte(']')
+
+	default:
+		sb.WriteString("OrderedMap[")
+		for i, k := range m.keys {
+			if i != 0 {
+				sb.WriteByte(' ')
+			}
+			fmt.Fprint(sb, k, ":", m.m[k].v)
+		}
+		sb.WriteByte(']')
+	}
+
+	fmt.Fprint(s, sb.String())
 }
 
 type SliceHandler struct {
