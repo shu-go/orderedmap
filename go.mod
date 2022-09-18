@@ -1,0 +1,7 @@
+module github.com/shu-go/orderedmap
+
+go 1.19
+
+require github.com/shu-go/gotwant v0.0.0-20190920074605-b4f19c0bac91
+
+require github.com/shu-go/jbdec v0.0.0-20220918045523-910298cdc6d9
