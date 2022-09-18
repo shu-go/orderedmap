@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"log"
 	"sort"
 
 	"github.com/shu-go/jbdec"
@@ -197,11 +196,9 @@ func (m *OrderedMap[K, V]) UnmarshalJSON(b []byte) error {
 					s = s[1 : len(s)-1] // trim "
 					err2 := json.Unmarshal(s, &key)
 					if err2 != nil {
-						log.Print(198)
 						return err2
 					}
 				} else {
-					log.Print(202)
 					return err
 				}
 			}
@@ -261,7 +258,6 @@ func (m *OrderedMap[K, V]) UnmarshalJSON(b []byte) error {
 		if len(stack) == 0 {
 			err := json.Unmarshal(valueBuf.Bytes(), &value)
 			if err != nil {
-				log.Print(259, valueBuf.String())
 				return err
 			}
 
