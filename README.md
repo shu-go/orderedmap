@@ -2,6 +2,7 @@ Generic orderedmap with (Un)MarshalJSON
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/shu-go/orderedmap)](https://goreportcard.com/report/github.com/shu-go/orderedmap)
 ![MIT License](https://img.shields.io/badge/License-MIT-blue)
+[![Go Reference](https://pkg.go.dev/badge/github.com/shu-go/orderedmap.svg)](https://pkg.go.dev/github.com/shu-go/orderedmap)
 
 # go get
 
