@@ -96,15 +96,14 @@ func Example_unmarshal() {
 }
 
 func Example_sort() {
-	m := orderedmap.New[int, int]()
-	m.Set(5, 1)
-	m.Set(9, 2)
-	m.Set(6, 3)
-	m.Set(3, 4)
+	m := orderedmap.New[string, int]()
+	m.Set("5", 1)
+	m.Set("9", 2)
+	m.Set("6", 3)
+	m.Set("3", 4)
 
-	keys := m.Keys()
-	m.Sort(func(i, j int) bool {
-		return keys[i] < keys[j]
+	m.Sort(func(i, j string) bool {
+		return i < j
 	})
 
 	b, _ /*err*/ := json.MarshalIndent(m, "", "  ")
@@ -265,17 +264,16 @@ func TestPrint(t *testing.T) {
 }
 
 func TestSort(t *testing.T) {
-	m := orderedmap.New[int, int]()
-	m.Set(5, 0)
-	m.Set(9, 0)
-	m.Set(6, 0)
-	m.Set(3, 0)
+	m := orderedmap.New[string, int]()
+	m.Set("5", 0)
+	m.Set("9", 0)
+	m.Set("6", 0)
+	m.Set("3", 0)
 
-	keys := m.Keys()
-	m.Sort(func(i, j int) bool {
-		return keys[i] < keys[j]
+	m.Sort(func(i, j string) bool {
+		return i < j
 	})
-	gotwant.Test(t, m.Keys(), []int{3, 5, 6, 9})
+	gotwant.Test(t, m.Keys(), []string{"3", "5", "6", "9"})
 
 	b, err := json.Marshal(m)
 	gotwant.TestError(t, err, nil)
@@ -283,11 +281,10 @@ func TestSort(t *testing.T) {
 
 	//
 
-	keys = m.Keys()
-	m.Sort(func(i, j int) bool {
-		return keys[i] > keys[j]
+	m.Sort(func(i, j string) bool {
+		return i > j
 	})
-	gotwant.Test(t, m.Keys(), []int{9, 6, 5, 3})
+	gotwant.Test(t, m.Keys(), []string{"9", "6", "5", "3"})
 
 	b, err = json.Marshal(m)
 	gotwant.TestError(t, err, nil)
@@ -885,9 +882,8 @@ func BenchmarkSort(b *testing.B) {
 			}
 			b.StartTimer()
 
-			keys := m.Keys()
-			m.Sort(func(i, j int) bool {
-				return keys[i] < keys[j]
+			m.Sort(func(i, j string) bool {
+				return i < j
 			})
 		}
 	})

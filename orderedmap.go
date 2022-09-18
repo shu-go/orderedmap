@@ -301,12 +301,14 @@ func (m *OrderedMap[K, V]) UnorderedMap() map[K]V {
 	return u
 }
 
-func (m *OrderedMap[K, V]) Sort(less func(int, int) bool) {
+func (m *OrderedMap[K, V]) Sort(less func(K, K) bool) {
 	handler := SliceHandler{
 		len: func() int {
 			return len(m.keys)
 		},
-		less: less,
+		less: func(i, j int) bool {
+			return less(m.keys[i], m.keys[j])
+		},
 		swap: func(i, j int) {
 			ikey := m.keys[i]
 			jkey := m.keys[j]
