@@ -27,6 +27,17 @@ m := orderedmap.New[int, int]()
 m.Set(1, 100)
 m.Set(9, 900)
 m.Set(2, 200)
+
+m.Keys() //=> []int{1, 9, 2}
+```
+
+### Re-Order
+
+```
+m.PreserveOrder(false)
+m.Set(1, 100)
+
+m.Keys() //=> []int{9, 2, 1}
 ```
 
 ## Get
