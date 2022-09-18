@@ -327,10 +327,6 @@ func (m *OrderedMap[K, V]) Sort(less func(int, int) bool) {
 }
 
 func (m OrderedMap[K, V]) Format(s fmt.State, verb rune) {
-	if verb != 'v' {
-		verb = 'v'
-	}
-
 	sb := &strings.Builder{}
 
 	switch true {
