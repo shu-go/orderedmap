@@ -206,7 +206,7 @@ func (m *OrderedMap[K, V]) UnmarshalJSON(b []byte) error {
 
 			colTok := dec.Next() // :
 			if colTok.Type != jbdec.NameSeparator {
-				return errors.New("no!")
+				return errors.New(": is required")
 			}
 
 			parsingKey = false
