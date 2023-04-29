@@ -608,6 +608,108 @@ func TestUnorderedMap(t *testing.T) {
 	}
 }
 
+func TestNil(t *testing.T) {
+	var std map[string]int
+	var m *orderedmap.OrderedMap[string, int]
+
+	t.Run("Set", func(t *testing.T) {
+		gotwant.TestPanic(t, func() {
+			std["ichi"] = 1
+		}, "assignment to entry in nil map")
+		gotwant.TestPanic(t, func() {
+			m.Set("ichi", 1)
+		}, "assignment to entry in nil map")
+	})
+
+	t.Run("Get", func(t *testing.T) {
+		gotwant.TestPanic(t, func() {
+			_, found := std["ichi"]
+			gotwant.Test(t, found, false)
+		}, nil)
+		gotwant.TestPanic(t, func() {
+			_, found := m.Get("ichi")
+			gotwant.Test(t, found, false)
+		}, nil)
+	})
+
+	t.Run("GetDefault", func(t *testing.T) {
+		gotwant.TestPanic(t, func() {
+			_, found := std["ichi"]
+			gotwant.Test(t, found, false)
+		}, nil)
+		gotwant.TestPanic(t, func() {
+			ichi := m.GetDefault("ichi", 1)
+			gotwant.Test(t, ichi, 1)
+		}, nil)
+	})
+
+	t.Run("Delete", func(t *testing.T) {
+		gotwant.TestPanic(t, func() {
+			delete(std, "ichi")
+		}, nil)
+		gotwant.TestPanic(t, func() {
+			m.Delete("ichi")
+		}, nil)
+	})
+
+	t.Run("Keys", func(t *testing.T) {
+		gotwant.TestPanic(t, func() {
+			for k := range std {
+				k = k + ""
+			}
+		}, nil)
+		gotwant.TestPanic(t, func() {
+			_ = m.Keys()
+		}, nil)
+	})
+
+	t.Run("Contains", func(t *testing.T) {
+		gotwant.TestPanic(t, func() {
+			_, found := std["ichi"]
+			gotwant.Test(t, found, false)
+		}, nil)
+		gotwant.TestPanic(t, func() {
+			found := m.Contains("ichi")
+			gotwant.Test(t, found, false)
+		}, nil)
+	})
+
+	t.Run("MarshalJSON", func(t *testing.T) {
+		gotwant.TestPanic(t, func() {
+			b, err := json.Marshal(std)
+			gotwant.TestError(t, err, nil)
+			gotwant.Test(t, string(b), "null")
+		}, nil)
+		gotwant.TestPanic(t, func() {
+			b, err := json.Marshal(m)
+			gotwant.TestError(t, err, nil)
+			gotwant.Test(t, string(b), "null")
+
+			var mm orderedmap.OrderedMap[string, int]
+			b, err = json.Marshal(mm)
+			gotwant.TestError(t, err, nil)
+			gotwant.Test(t, string(b), "{}")
+		}, nil)
+	})
+
+	t.Run("UnmarshalJSON", func(t *testing.T) {
+		gotwant.TestPanic(t, func() {
+			var std map[string]int
+
+			err := json.Unmarshal([]byte(`{"ichi":1}`), &std)
+			gotwant.TestError(t, err, nil)
+			gotwant.Test(t, std["ichi"], 1)
+		}, nil)
+		gotwant.TestPanic(t, func() {
+			var m *orderedmap.OrderedMap[string, int]
+
+			err := json.Unmarshal([]byte(`{"ichi":1}`), &m)
+			gotwant.TestError(t, err, nil)
+			gotwant.Test(t, m.GetDefault("ichi", 999), 1)
+		}, nil)
+	})
+}
+
 func BenchmarkSet(b *testing.B) {
 	std := make(map[string]int)
 	m := orderedmap.New[string, int]()

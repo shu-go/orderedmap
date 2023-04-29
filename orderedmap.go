@@ -43,6 +43,10 @@ func (m *OrderedMap[K, V]) PreserveOrder(b bool) {
 }
 
 func (m *OrderedMap[K, V]) Set(key K, value V) {
+	if m == nil {
+		panic("assignment to entry in nil map")
+	}
+
 	e, found := m.m[key]
 
 	if !found {
@@ -61,6 +65,10 @@ func (m *OrderedMap[K, V]) Set(key K, value V) {
 }
 
 func (m *OrderedMap[K, V]) Delete(key K) {
+	if m == nil {
+		return
+	}
+
 	e, found := m.m[key]
 
 	if !found {
@@ -74,6 +82,11 @@ func (m *OrderedMap[K, V]) Delete(key K) {
 }
 
 func (m *OrderedMap[K, V]) Get(key K) (V, bool) {
+	if m == nil {
+		var gnil V
+		return gnil, false
+	}
+
 	e, found := m.m[key]
 	if found {
 		return e.v, true
@@ -84,6 +97,10 @@ func (m *OrderedMap[K, V]) Get(key K) (V, bool) {
 }
 
 func (m *OrderedMap[K, V]) GetDefault(key K, defvalue V) V {
+	if m == nil {
+		return defvalue
+	}
+
 	value, found := m.Get(key)
 	if found {
 		return value
@@ -92,15 +109,27 @@ func (m *OrderedMap[K, V]) GetDefault(key K, defvalue V) V {
 }
 
 func (m *OrderedMap[K, V]) Keys() []K {
+	if m == nil {
+		return nil
+	}
+
 	return m.keys
 }
 
 func (m *OrderedMap[K, V]) Contains(key K) bool {
+	if m == nil {
+		return false
+	}
+
 	_, found := m.m[key]
 	return found
 }
 
 func (m *OrderedMap[K, V]) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return []byte("null"), nil
+	}
+
 	buf := &m.work
 	buf.Reset()
 	buf.Grow(len(m.m) * 8)
