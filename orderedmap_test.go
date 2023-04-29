@@ -608,6 +608,22 @@ func TestUnorderedMap(t *testing.T) {
 	}
 }
 
+func TestLen(t *testing.T) {
+	m := orderedmap.New[string, int]()
+	gotwant.Test(t, m.Len(), 0)
+
+	m.Set("ichi", 1)
+	gotwant.Test(t, m.Len(), 1)
+	m.Set("ichi", 11)
+	gotwant.Test(t, m.Len(), 1)
+	m.Set("ni", 2)
+	gotwant.Test(t, m.Len(), 2)
+	m.Delete("ichi")
+	gotwant.Test(t, m.Len(), 1)
+	m.Delete("ni")
+	gotwant.Test(t, m.Len(), 0)
+}
+
 func TestNil(t *testing.T) {
 	var std map[string]int
 	var m *orderedmap.OrderedMap[string, int]
@@ -660,6 +676,15 @@ func TestNil(t *testing.T) {
 		}, nil)
 		gotwant.TestPanic(t, func() {
 			_ = m.Keys()
+		}, nil)
+	})
+
+	t.Run("Len", func(t *testing.T) {
+		gotwant.TestPanic(t, func() {
+			gotwant.Test(t, len(std), 0)
+		}, nil)
+		gotwant.TestPanic(t, func() {
+			gotwant.Test(t, m.Len(), 0)
 		}, nil)
 	})
 

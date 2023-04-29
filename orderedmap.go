@@ -108,6 +108,13 @@ func (m *OrderedMap[K, V]) GetDefault(key K, defvalue V) V {
 	return defvalue
 }
 
+func (m *OrderedMap[K, V]) Len() int {
+	if m == nil {
+		return 0
+	}
+	return len(m.keys)
+}
+
 func (m *OrderedMap[K, V]) Keys() []K {
 	if m == nil {
 		return nil
