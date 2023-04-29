@@ -2,3 +2,5 @@ github.com/shu-go/gotwant v0.0.0-20190920074605-b4f19c0bac91 h1:nwDc3kHbf9scf1UZ
 github.com/shu-go/gotwant v0.0.0-20190920074605-b4f19c0bac91/go.mod h1:FZepfqvib0mXjHiaQPTv0RUD5QMpMA/FHLfBQjZRRQg=
 github.com/shu-go/jbdec v0.0.0-20220918045523-910298cdc6d9 h1:KVYNaOgPKeJQXK7MHtkq/K5T2vGPDeUDZww0Mwq82R8=
 github.com/shu-go/jbdec v0.0.0-20220918045523-910298cdc6d9/go.mod h1:q+VLmH05GrhUKFQtlA0xoPHr+UUyl6dkhGPZmV5Pvic=
+github.com/shu-go/jbdec v0.0.0-20220921010705-e868957092eb h1:pXgRecLXEnu1sBH2U7u17VQCiQ4kIwfHEGPQ/VMy4E0=
+github.com/shu-go/jbdec v0.0.0-20220921010705-e868957092eb/go.mod h1:q+VLmH05GrhUKFQtlA0xoPHr+UUyl6dkhGPZmV5Pvic=
