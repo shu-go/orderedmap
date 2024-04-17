@@ -86,12 +86,14 @@ func Example_unmarshal() {
 	fmt.Println(m.Get(9))
 	fmt.Println(m.Get(6))
 	fmt.Println(m.Get(3))
+	fmt.Println(m.Get(999))
 	fmt.Println(m.Get(9999))
 	// Output:
 	// go true
 	// ku true
 	// ro- true
 	// san true
+	//  false
 	//  false
 }
 

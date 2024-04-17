@@ -183,6 +183,8 @@ func (m *OrderedMap[K, V]) MarshalJSON() ([]byte, error) {
 }
 
 func (m *OrderedMap[K, V]) UnmarshalJSON(b []byte) error {
+	*m = *New[K, V]() // clear
+
 	if len(b) == 0 {
 		return nil
 	}
