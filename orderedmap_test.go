@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	"gopkg.in/yaml.v3"
+
 	"github.com/shu-go/gotwant"
 	"github.com/shu-go/orderedmap"
 )
@@ -69,6 +71,23 @@ func Example_marshal() {
 
 }
 
+func Example_marshalYAML() {
+	m := orderedmap.New[int, string]()
+	m.Set(5, "go")
+	m.Set(9, "ku")
+	m.Set(6, "ro-")
+	m.Set(3, "san")
+
+	b, _ /*err*/ := yaml.Marshal(m)
+
+	fmt.Println(string(b))
+	// Output:
+	// "5": go
+	// "9": ku
+	// "6": ro-
+	// "3": san
+}
+
 func Example_unmarshal() {
 	m := orderedmap.New[int, string]()
 	m.Set(999, "dummy")
@@ -95,6 +114,96 @@ func Example_unmarshal() {
 	// san true
 	//  false
 	//  false
+}
+
+func Example_unmarshalYAML() {
+	// DOES NOT SUPPORT number keys
+	m := orderedmap.New[string, string]()
+	m.Set("999", "dummy")
+
+	s := `
+"5": go
+"9": ku
+"6": ro-
+"3": san
+`
+
+	err := yaml.Unmarshal([]byte(s), m)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(m.Get("5"))
+	fmt.Println(m.Get("9"))
+	fmt.Println(m.Get("6"))
+	fmt.Println(m.Get("3"))
+	fmt.Println(m.Get("999"))
+	fmt.Println(m.Get("9999"))
+	// Output:
+	// go true
+	// ku true
+	// ro- true
+	// san true
+	//  false
+	//  false
+}
+
+func Example_unmarshalYAML2() {
+	type aaa struct {
+		A string
+		B bool
+		C []int
+	}
+	m := orderedmap.New[string, aaa]()
+	m.Set("rei", aaa{A: "0", B: false, C: []int{}})
+	m.Set("ichi", aaa{A: "1", B: true, C: []int{1}})
+	m.Set("ni", aaa{A: "2", B: false, C: []int{1, 2}})
+	m.Set("san", aaa{A: "3", B: true, C: []int{1, 2, 3}})
+	m.Set("shi", aaa{A: "4", B: false, C: []int{1, 2, 3, 4}})
+
+	data, err := yaml.Marshal(m)
+	if err != nil {
+		fmt.Println("marshal", err)
+	}
+	fmt.Println(string(data))
+
+	// Output:
+	// rei:
+	//     a: "0"
+	//     b: false
+	//     c: []
+	// ichi:
+	//     a: "1"
+	//     b: true
+	//     c:
+	//         - 1
+	// ni:
+	//     a: "2"
+	//     b: false
+	//     c:
+	//         - 1
+	//         - 2
+	// san:
+	//     a: "3"
+	//     b: true
+	//     c:
+	//         - 1
+	//         - 2
+	//         - 3
+	// shi:
+	//     a: "4"
+	//     b: false
+	//     c:
+	//         - 1
+	//         - 2
+	//         - 3
+	//         - 4
+
+	err = yaml.Unmarshal(data, m)
+	if err != nil {
+		fmt.Println("unmarshal", err)
+	}
 }
 
 func Example_sort() {
@@ -308,6 +417,13 @@ func TestMarshal(t *testing.T) {
 		gotwant.TestError(t, err, nil)
 		gotwant.Test(t, string(j), `{}`)
 	})
+	t.Run("EmptyYAML", func(t *testing.T) {
+		m := orderedmap.New[string, string]()
+		j, err := yaml.Marshal(m)
+		gotwant.TestError(t, err, nil)
+		gotwant.Test(t, string(j), `null
+`)
+	})
 
 	t.Run("String2Int", func(t *testing.T) {
 		m := orderedmap.New[string, int]()
@@ -319,6 +435,19 @@ func TestMarshal(t *testing.T) {
 		gotwant.TestError(t, err, nil)
 		gotwant.Test(t, string(j), `{"b":2,"a":1,"c":3}`)
 	})
+	t.Run("String2IntYAML", func(t *testing.T) {
+		m := orderedmap.New[string, int]()
+		m.Set("b", 2)
+		m.Set("a", 1)
+		m.Set("c", 3)
+
+		j, err := yaml.Marshal(m)
+		gotwant.TestError(t, err, nil)
+		gotwant.Test(t, string(j), `b: 2
+a: 1
+c: 3
+`)
+	})
 
 	t.Run("Int2String", func(t *testing.T) {
 		m := orderedmap.New[int, string]()
@@ -329,6 +458,19 @@ func TestMarshal(t *testing.T) {
 		j, err := json.Marshal(m)
 		gotwant.TestError(t, err, nil)
 		gotwant.Test(t, string(j), `{"2":"b","1":"a","3":"c"}`)
+	})
+	t.Run("Int2StringYAML", func(t *testing.T) {
+		m := orderedmap.New[int, string]()
+		m.Set(2, "b")
+		m.Set(1, "a")
+		m.Set(3, "c")
+
+		j, err := yaml.Marshal(m)
+		gotwant.TestError(t, err, nil)
+		gotwant.Test(t, string(j), `"2": b
+"1": a
+"3": c
+`)
 	})
 
 	t.Run("MyStruct", func(t *testing.T) {
@@ -358,6 +500,26 @@ func TestMarshal(t *testing.T) {
   }
 }`)
 	})
+	t.Run("MyStructYAML", func(t *testing.T) {
+		type myStruct struct {
+			V1 string `yaml:"v"`
+			V2 string `yaml:"w"`
+		}
+		m := orderedmap.New[string, myStruct]()
+
+		m.Set("a", myStruct{V1: "a-v1", V2: "a-v2"})
+		m.Set("b", myStruct{V1: "b-v1", V2: "b-v2"})
+
+		j, err := yaml.Marshal(m)
+		gotwant.TestError(t, err, nil)
+		gotwant.Test(t, string(j), `a:
+    v: a-v1
+    w: a-v2
+b:
+    v: b-v1
+    w: b-v2
+`)
+	})
 
 	t.Run("Nest", func(t *testing.T) {
 		m := orderedmap.New[string, *orderedmap.OrderedMap[string, string]]()
@@ -381,6 +543,25 @@ func TestMarshal(t *testing.T) {
   }
 }`)
 	})
+	t.Run("NestYAML", func(t *testing.T) {
+		m := orderedmap.New[string, *orderedmap.OrderedMap[string, string]]()
+		subm := orderedmap.New[string, string]()
+		subm.Set("sub1", "ichi")
+		subm.Set("sub2", "ni")
+		m.Set("1", subm)
+		subm = orderedmap.New[string, string]()
+		subm.Set("sub3", "san")
+		m.Set("2", subm)
+
+		j, err := yaml.Marshal(m)
+		gotwant.TestError(t, err, nil)
+		gotwant.Test(t, string(j), `"1":
+    sub1: ichi
+    sub2: ni
+"2":
+    sub3: san
+`)
+	})
 }
 
 func TestUnmarshal(t *testing.T) {
@@ -391,10 +572,36 @@ func TestUnmarshal(t *testing.T) {
 
 		gotwant.Test(t, len(m.Keys()), 0)
 	})
+	t.Run("EmptyYAML", func(t *testing.T) {
+		m := orderedmap.New[string, string]()
+		err := yaml.Unmarshal([]byte(`{}`), &m)
+		gotwant.TestError(t, err, nil)
+
+		gotwant.Test(t, len(m.Keys()), 0)
+	})
+	t.Run("EmptyYAML2", func(t *testing.T) {
+		m := orderedmap.New[string, string]()
+		err := yaml.Unmarshal([]byte(`null`), &m)
+		gotwant.TestError(t, err, nil)
+
+		gotwant.Test(t, len(m.Keys()), 0)
+	})
 
 	t.Run("String2Int", func(t *testing.T) {
 		m := orderedmap.New[string, int]()
 		err := json.Unmarshal([]byte(`{"z":1, "b": 2}`), &m)
+		gotwant.TestError(t, err, nil)
+
+		v, found := m.Get("b")
+		gotwant.Test(t, found, true)
+		gotwant.Test(t, v, 2)
+
+		gotwant.Test(t, m.Keys(), []string{"z", "b"})
+	})
+	t.Run("String2IntYAML", func(t *testing.T) {
+		m := orderedmap.New[string, int]()
+		err := yaml.Unmarshal([]byte(`z: 1
+b: 2`), &m)
 		gotwant.TestError(t, err, nil)
 
 		v, found := m.Get("b")
@@ -441,6 +648,31 @@ func TestUnmarshal(t *testing.T) {
 		gotwant.Test(t, v, myStruct{V1: "b-v1", V2: "b-v2"})
 
 		v, found = m.Get("1")
+		gotwant.Test(t, found, true)
+		gotwant.Test(t, v, myStruct{V1: "a-v1", V2: "a-v2"})
+	})
+	t.Run("MyStructYAML", func(t *testing.T) {
+		type myStruct struct {
+			V1 string `yaml:"v"`
+			V2 string `yaml:"w"`
+		}
+		m := orderedmap.New[string, myStruct]()
+		err := yaml.Unmarshal([]byte(`b:
+    v: b-v1
+    w: b-v2
+c:
+    v: a-v1
+    w: a-v2
+`), &m)
+		gotwant.TestError(t, err, nil)
+
+		gotwant.Test(t, m.Keys(), []string{"b", "c"})
+
+		v, found := m.Get("b")
+		gotwant.Test(t, found, true)
+		gotwant.Test(t, v, myStruct{V1: "b-v1", V2: "b-v2"})
+
+		v, found = m.Get("c")
 		gotwant.Test(t, found, true)
 		gotwant.Test(t, v, myStruct{V1: "a-v1", V2: "a-v2"})
 	})

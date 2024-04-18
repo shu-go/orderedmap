@@ -1,6 +1,8 @@
 github.com/shu-go/gotwant v0.0.0-20190920074605-b4f19c0bac91 h1:nwDc3kHbf9scf1UZIWiWw5tZF3Z4yOJAMjNN+kYXJwE=
 github.com/shu-go/gotwant v0.0.0-20190920074605-b4f19c0bac91/go.mod h1:FZepfqvib0mXjHiaQPTv0RUD5QMpMA/FHLfBQjZRRQg=
-github.com/shu-go/jbdec v0.0.0-20220921010705-e868957092eb h1:pXgRecLXEnu1sBH2U7u17VQCiQ4kIwfHEGPQ/VMy4E0=
-github.com/shu-go/jbdec v0.0.0-20220921010705-e868957092eb/go.mod h1:q+VLmH05GrhUKFQtlA0xoPHr+UUyl6dkhGPZmV5Pvic=
 github.com/shu-go/jbdec v0.0.0-20231016080759-9d3d689232f6 h1:wJl9Khh7W4Hcw9AvET8K2N/UPZptTujWK+6XZemwxaU=
 github.com/shu-go/jbdec v0.0.0-20231016080759-9d3d689232f6/go.mod h1:MxVrqNP/f4D1hBSxVx9Pji03NnsQlDfnNlDea9uLyu4=
+gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
+gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
+gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=

@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/shu-go/jbdec"
+	"gopkg.in/yaml.v3"
 )
 
 type elem[V any] struct {
@@ -324,6 +325,63 @@ func (m *OrderedMap[K, V]) UnmarshalJSON(b []byte) error {
 
 			parsingKey = true
 		}
+	}
+
+	return nil
+}
+
+func (m *OrderedMap[K, V]) MarshalYAML() (any, error) {
+	if m == nil || len(m.keys) == 0 {
+		return nil, nil
+	}
+
+	var v V
+	vtype := reflect.TypeOf(v)
+	fields := make([]reflect.StructField, 0, len(m.keys))
+	for i := 0; i < len(m.keys); i++ {
+		fields = append(fields, reflect.StructField{
+			Name: fmt.Sprintf("F%05d", i),
+			Type: vtype,
+			Tag:  reflect.StructTag(fmt.Sprintf(`yaml:"%v"`, m.keys[i])),
+		})
+	}
+
+	stType := reflect.StructOf(fields)
+	st := reflect.New(stType).Elem()
+
+	for i := 0; i < len(m.keys); i++ {
+		st.FieldByIndex([]int{i}).Set(reflect.ValueOf(m.GetDefault(m.keys[i], v)))
+	}
+
+	return st.Interface(), nil
+}
+
+// NOT SUPPORTED: number key, nested OrderedMap
+func (m *OrderedMap[K, V]) UnmarshalYAML(value *yaml.Node) error {
+	*m = *New[K, V]() // clear
+
+	for i := 0; i < len(value.Content); i += 2 {
+		key := value.Content[i]
+		val := value.Content[i+1]
+
+		var k K
+		var v V
+
+		//if err := key.Decode(&k); err != nil {
+		//	return err
+		//}
+		if err := key.Decode(&k); err != nil {
+			if len(key.Value) >= 2 && key.Value[0] == '"' && key.Value[len(key.Value)-1] == '"' {
+				key.Value = key.Value[1 : len(key.Value)-1]
+				err = key.Decode(&k)
+			}
+			return err
+		}
+		if err := val.Decode(&v); err != nil {
+			return err
+		}
+
+		m.Set(k, v)
 	}
 
 	return nil
