@@ -21,7 +21,7 @@ type elem[V any] struct {
 }
 
 type OrderedMap[K comparable, V any] struct {
-	m map[K]elem[V]
+	m map[K]*elem[V]
 
 	keys []K
 
@@ -32,7 +32,7 @@ type OrderedMap[K comparable, V any] struct {
 
 func New[K comparable, V any]() *OrderedMap[K, V] {
 	return &OrderedMap[K, V]{
-		m:    make(map[K]elem[V]),
+		m:    make(map[K]*elem[V]),
 		keys: nil,
 
 		overwriteSeq: false,
@@ -48,21 +48,22 @@ func (m *OrderedMap[K, V]) Set(key K, value V) {
 		panic("assignment to entry in nil map")
 	}
 
-	e, found := m.m[key]
-
-	if !found {
+	if e, found := m.m[key]; !found {
 		m.keys = append(m.keys, key)
-		e.maxIdx = len(m.keys)
+		m.m[key] = &elem[V]{
+			maxIdx: len(m.keys),
+			v:      value,
+		}
 
-	} else if m.overwriteSeq {
-		idx := m.indexOfKey(key, e.maxIdx)
-		e.maxIdx = idx
-		m.keys = append(m.keys[:idx], m.keys[idx+1:]...)
-		m.keys = append(m.keys, key)
+	} else {
+		e.v = value
+		if m.overwriteSeq {
+			idx := m.indexOfKey(key, e.maxIdx)
+			e.maxIdx = idx
+			m.keys = append(m.keys[:idx], m.keys[idx+1:]...)
+			m.keys = append(m.keys, key)
+		}
 	}
-
-	e.v = value
-	m.m[key] = e
 }
 
 func (m *OrderedMap[K, V]) Delete(key K) {
@@ -88,8 +89,7 @@ func (m *OrderedMap[K, V]) Get(key K) (V, bool) {
 		return gnil, false
 	}
 
-	e, found := m.m[key]
-	if found {
+	if e, found := m.m[key]; found {
 		return e.v, true
 	}
 
@@ -190,7 +190,7 @@ func (m *OrderedMap[K, V]) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 
-	m.m = make(map[K]elem[V])
+	m.m = make(map[K]*elem[V])
 	m.keys = m.keys[:0]
 
 	var key K
